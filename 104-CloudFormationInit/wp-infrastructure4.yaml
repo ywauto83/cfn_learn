@@ -127,7 +127,7 @@ Resources:
             yum:
               httpd: []
               php: []
-              mysql: []
+             # mysql: []
               php-mysql: []
           sources:
             /var/www/html: "http://wordpress.org/latest.tar.gz"

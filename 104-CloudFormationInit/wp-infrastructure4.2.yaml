@@ -17,6 +17,9 @@ Parameters:
     Type: String
     Default: w0rdpr355
     NoEcho: true
+  TestString:
+    Type: String
+    Default: test9
 Mappings:
   RegionMap:
     us-east-1:
@@ -80,12 +83,7 @@ Resources:
             #!/bin/bash
             yum update aws-cfn-bootstrap -y # good practice - always do this.
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EC2 --configsets wordpress --region ${AWS::Region}
-            yum -y update
-            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource EC2 --region ${AWS::Region}
-    CreationPolicy:
-      ResourceSignal:
-        Count: "1"
-        Timeout: PT15M
+            yum update -y
     Metadata:
       AWS::CloudFormation::Init:
         configSets:
@@ -114,8 +112,8 @@ Resources:
               mode: "000400"
               owner: root
               group: root
-            /var/www/html/index2.html:
-              content: "test9"
+           # /var/www/html/index2.html:
+           #   content: !Ref TestString
           services:
             sysvinit:
               cfn-hup:
@@ -129,7 +127,7 @@ Resources:
             yum:
               httpd: []
               php: []
-             # mysql: []
+              mariadb: []
               php-mysql: []
           sources:
             /var/www/html: "http://wordpress.org/latest.tar.gz"
@@ -141,23 +139,23 @@ Resources:
         config_wordpress:
           commands:
             01_clone_config:
-              cwd: "/var/www/html/wordpress"
-              test: "test ! -e /var/www/html/wordpress/wp-config.php"
+              cwd: "/var/www/html"
+              test: "test ! -e /var/www/html/wp-config.php"
               command: "cp wp-config-sample.php wp-config.php"
             02_inject_dbhost:
-              cwd: "/var/www/html/wordpress"
+              cwd: "/var/www/html"
               command: !Sub |
                 sed -i 's/localhost/${DB.Endpoint.Address}/g' wp-config.php
             03_inject_dbname:
-              cwd: "/var/www/html/wordpress"
+              cwd: "/var/www/html"
               command: !Sub |
                 sed -i 's/database_name_here/${DatabaseName}/g' wp-config.php
             04_inject_dbuser:
-              cwd: "/var/www/html/wordpress"
+              cwd: "/var/www/html"
               command: !Sub |
                 sed -i 's/username_here/${DatabaseUser}/g' wp-config.php
             05_inject_dbpassword:
-              cwd: "/var/www/html/wordpress"
+              cwd: "/var/www/html"
               command: !Sub |
                 sed -i 's/password_here/${DatabasePassword}/g' wp-config.php
   S3:
