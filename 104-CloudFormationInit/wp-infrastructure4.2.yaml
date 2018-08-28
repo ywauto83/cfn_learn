@@ -131,6 +131,7 @@ Resources:
               php-mysql: []
           sources:
             /var/www/html: "http://wordpress.org/latest.tar.gz"
+          commands: "cp /var/www/html/wordpress/*.* /var/www/html"
           services:
             sysvinit:
               httpd:
