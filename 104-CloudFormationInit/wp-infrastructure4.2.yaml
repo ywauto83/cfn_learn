@@ -131,7 +131,6 @@ Resources:
               php-mysql: []
           sources:
             /var/www/html: "http://wordpress.org/latest.tar.gz"
-          commands: "cp /var/www/html/wordpress/*.* /var/www/html"
           services:
             sysvinit:
               httpd:
@@ -139,6 +138,8 @@ Resources:
                 ensureRunning: "true"
         config_wordpress:
           commands:
+            00_cp_wordpress:
+              command: "cp -a /var/www/html/wordpress/. /var/www/html"
             01_clone_config:
               cwd: "/var/www/html"
               test: "test ! -e /var/www/html/wp-config.php"
